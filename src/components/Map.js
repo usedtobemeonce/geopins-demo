@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
 import ReactMapGL, { NavigationControl, Marker } from 'react-map-gl';
 import { withStyles } from "@material-ui/core/styles";
+import differenceInMinutes from 'date-fns/difference_in_minutes';
 // import Button from "@material-ui/core/Button";
 // import Typography from "@material-ui/core/Typography";
 // import DeleteIcon from "@material-ui/icons/DeleteTwoTone";
 
+import { useClient } from '../client';
+import { GET_PINS_QUERY } from '../graphql/queries';
 import PinIcon from './PinIcon';
 import Blog from './Blog';
 import Context from '../context';
@@ -16,6 +19,7 @@ const INITIAL_VIEWPORT = {
 }
 
 const Map = ({ classes }) => {
+  const client = useClient();
   const { state, dispatch } = useContext(Context);
   const [viewport, setViewport] = useState(INITIAL_VIEWPORT);
   const [userPosition, setUserPosition] = useState(null);
@@ -23,6 +27,15 @@ const Map = ({ classes }) => {
   useEffect(() => {
     getUserPosition();
   }, []);
+
+  useEffect(() => {
+    getPins();
+  }, []);
+
+  const getPins = async () => {
+    const { getPins } = await client.request(GET_PINS_QUERY);
+    dispatch({ type: 'GET_PINS', payload: getPins });
+  }
 
   const getUserPosition = () => {
     if ('geolocation' in navigator) {
@@ -47,6 +60,11 @@ const Map = ({ classes }) => {
         longitude
       }
     })
+  }
+
+  const highlightNewPin = pin => {
+    const isNewPin = differenceInMinutes(Date.now(), Number(pin.createdAt)) <= 30;
+    return isNewPin ? 'limegreen' : 'darkblue';
   }
 
   return (
@@ -86,6 +104,18 @@ const Map = ({ classes }) => {
             <PinIcon size={40} color="hotpink" />
           </Marker>
         )}
+
+        {state.pins.map(pin => (
+          <Marker
+            key={pin._id}
+            latitude={pin.latitude}
+            longitude={pin.longitude}
+            offsetLeft={-19}
+            offsetTop={-37}
+          >
+            <PinIcon size={40} color={highlightNewPin(pin)} />
+          </Marker>
+        ))}
       </ReactMapGL>
 
       <Blog />
