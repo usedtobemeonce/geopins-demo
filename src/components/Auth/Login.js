@@ -13,17 +13,11 @@ const Login = ({ classes }) => {
   const onSuccess = async googleUser => {
     try {
       const idToken = googleUser.getAuthResponse().id_token;
-      const client = new GraphQLClient({
-        url: BASE_URL,
-        fetchOptions: {
-          mode: 'no-cors'
-        }
-      }, {
-          headers: { authorization: idToken }
-        }
-      );
+      const client = new GraphQLClient(BASE_URL, {
+        // mode: 'no-cors',
+        headers: { authorization: idToken }
+      });
       const { me } = await client.request(ME_QUERY);
-      console.log(me);
       dispatch({ type: 'LOGIN_USER', payload: me });
       dispatch({ type: 'IS_LOGGED_IN', payload: googleUser.isSignedIn() });
     } catch (err) {

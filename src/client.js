@@ -20,17 +20,17 @@ export const useClient = () => {
         setIdToken(token);
     }, []);
 
-    // return new GraphQLClient(BASE_URL, {
-    //     headers: { authorization: idToken }
-    // });
-    return new GraphQLClient(
-        {
-            url: BASE_URL,
-            fetchOptions: {
-                mode: 'no-cors'
-            }
-        }, {
-            headers: { authorization: idToken }
-        }
-    );
+    return new GraphQLClient(BASE_URL, {
+        headers: { authorization: idToken }
+    });
+    // return new GraphQLClient(
+    //     {
+    //         url: BASE_URL,
+    //         fetchOptions: {
+    //             mode: 'no-cors'
+    //         }
+    //     }, {
+    //         headers: { authorization: idToken }
+    //     }
+    // );
 }
