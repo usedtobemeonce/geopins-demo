@@ -17,7 +17,8 @@ import { WebSocketLink } from 'apollo-link-ws';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 
 const wsLink = new WebSocketLink({
-  uri: 'ws://localhost:4000/graphql',
+  uri: 'wss://geopins-demo.herokuapp.com/graphql',
+  // uri: 'ws://localhost:4000/graphql',
   options: {
     reconnect: true
   }
@@ -25,7 +26,10 @@ const wsLink = new WebSocketLink({
 
 const client = new ApolloClient({
   link: wsLink,
-  cache: new InMemoryCache()
+  cache: new InMemoryCache(),
+  opts: {
+    mode: 'no-cors'
+  }
 });
 
 const Root = () => {
